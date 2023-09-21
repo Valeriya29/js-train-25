@@ -147,7 +147,18 @@ console.log(data)
   // Чекаємо поки виконається проміс якому встановимо затримку 1 секунду за допомогою setTimeout
   // Віддаємо значення лічильника та збільшуємо його на один
 
+		async function* asyncGenerator() {
+		let i = 0;
+		while (true) {
+		await new Promise((res) => {
+		setTimeout(() => res(), 1000)
+		});
+		yield i++
+		}
+		}
   // Використовуємо асинхронний генератор та записуємо його значення в константу gen
+
+			const gen = asyncGenerator();
 
   // Створюємо асинхрону функцію printFiveItems
   // Ключові слова "for await" використовуються для ітерації по асинхронним ітерабельним об'єктам.
@@ -155,9 +166,16 @@ console.log(data)
   // Виводимо в консоль поточне значення
   // Умова "if (value === 4) break" зупиняє цикл після виведення п'яти чисел (від 0 до 4).
 
+			async function printFiveItems() {
+				for await (const value of gen) {
+					console.log(value);
+					if (value === 4) break
+	}
+}
+
   // Розкоментуйте після виконання завданння
-  // console.log("Завдання: 5 ==============================");
-  // printFiveItems();
+  console.log("Завдання: 5 ==============================");
+  await printFiveItems();
 
   //Завдання 6
 
@@ -198,16 +216,38 @@ console.log(data)
   // Те саме робимо для асинхронної функції getDataFromAPI(), результат зберігаємо в apiData
 
   // І знову для асинхронної функції getDataFromCache(), результат зберігаємо в cacheData
-  // Виводимо помилки в консоль якщо вони є
+			// Виводимо помилки в консоль якщо вони є
+			
+			async function* gatherData() {
+				try {
+					const dbData = await getDataFromDB();
+					yield dbData;
+
+					const apiData = await getDataFromAPI();
+					yield apiData;
+
+					const cacheData = await getDataFromCache();
+					yield cacheData;
+				} catch (error) {
+					console.log(error);
+				}
+			}
 
   // Створюємо асинхрону функцію displayData
   // Створюємо екземпляр генератора gatherData
-  // Три рази виводимо виводимо поточне значення генератора в консоль
+			// Три рази виводимо виводимо поточне значення генератора в консоль
+			
+			async function displayData() {
+				const example = gatherData();
+
+				    console.log((await example.next()).value);
+    				console.log((await example.next()).value);
+   					 console.log((await example.next()).value);
+			}
 
   // Розкоментуйте після виконання завданння
-  // console.log("Завдання: 6 ==============================");
-
-  // displayData();
+  console.log("Завдання: 6 ==============================");
+  await displayData();
 
   //Завдання 7
   // Створюємо генератор countdownGenerator, який створює послідовність чисел від вказаного значення до 0, має параметр start
@@ -216,17 +256,28 @@ console.log(data)
   // Цикл, що триває доки лічильник більший або рівний 0
   // Використовуємо ключове слово yield, щоб повернути поточне значення лічильника
 
-  // Зменшуємо лічильник на 1
+			// Зменшуємо лічильник на 1
+			
+			function* countdownGenerator(start) {
+				let count = start;
+				while (count >= 0) {
+					yield count;
+					count--;
+				}
+			}
 
-  // console.log("Завдання: 7 ==============================");
-  // Створюємо екземпляр генератора countdown з лічильниковм 5
-
-  // Запускаємо генератор та отримуємо перше значення яку записуємо в змінну nextValue
-  // Цикл while, що виводить значення з генератора, та працює поки не є генератор вичерпаним.
+  console.log("Завдання: 7 ==============================");
+			// Створюємо екземпляр генератора countdown з лічильниковм 5
+			const countd = countdownGenerator(5);
+			// Запускаємо генератор та отримуємо перше значення яку записуємо в змінну nextValue
+			let nextValue = await countd.next();
+			// Цикл while, що виводить значення з генератора, та працює поки не є генератор вичерпаним.
   // Якщо властивість done == false, генератор ще має значення для повернення.
-
-  // Виводимо поточне значення
-  // Отримуємо наступне значення з генератора
+			while (nextValue.done === false)
+				// Виводимо поточне значення
+				console.log(nextValue.value);
+			// Отримуємо наступне значення з генератора
+			nextValue = await countd.next();
 }
 
 main();
